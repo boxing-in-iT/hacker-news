@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { useGetCommentQuery } from "../../store/services/newsApi";
 import styled from "styled-components";
 
-const CommentItem = ({ id }) => {
+const CommentItem = ({ isShowing = false, id }) => {
   const { data, isLoading, isError } = useGetCommentQuery(id);
+  const [showReplies, setShowReplies] = useState(false);
+
+  if (!isShowing) {
+    return null;
+  }
 
   if (isLoading) {
     return <div>Loading comment...</div>;
@@ -19,11 +24,15 @@ const CommentItem = ({ id }) => {
       <CommentDate>
         Date: {new Date(data.time * 1000).toLocaleString()}
       </CommentDate>
-      <CommentText dangerouslySetInnerHTML={{ __html: data.text }} />
+      <CommentText
+        dangerouslySetInnerHTML={{ __html: data.text }}
+        onClick={() => setShowReplies((prev) => !prev)}
+      />
       {data.kids && (
         <ReplyComments>
+          <b>{data.kids.length} replies</b>
           {data.kids.map((replyId) => (
-            <CommentItem key={replyId} id={replyId} />
+            <CommentItem key={replyId} isShowing={showReplies} id={replyId} />
           ))}
         </ReplyComments>
       )}

@@ -8,7 +8,11 @@ const StoryPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { data, isFetching, error } = useNewsByIdQuery(id);
+  const { data, isFetching, isError } = useNewsByIdQuery(id);
+
+  if (isError) {
+    return <h1>Error</h1>;
+  }
 
   if (isFetching) {
     return <h1>Loading</h1>;
@@ -23,15 +27,17 @@ const StoryPage = () => {
       <NewsDate>Date: {new Date(data.time * 1000).toLocaleString()}</NewsDate>
       <NewsAuthor>Author: {data.by}</NewsAuthor>
       <CommentsCount>Comments: {data.kids?.length}</CommentsCount>
-      <ReloadButton>Reload Comments</ReloadButton>
       <BackButton onClick={() => navigate(-1)}>Back to News List</BackButton>
+      <ReloadButton onClick={() => window.location.reload()}>
+        Reload Comments
+      </ReloadButton>
       <CommentsList>
         {data.kids ? (
           <>
             {data.kids.map((data, index) => (
               <>
                 <h2>Comment: {index + 1}</h2>
-                <CommentItem id={data} />
+                <CommentItem isShowing={true} id={data} />
               </>
             ))}
           </>
@@ -81,10 +87,33 @@ const CommentsList = styled.div`
 
 const ReloadButton = styled.button`
   margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+
+  &:hover {
+    background-color: #0056b3;
+  }
 `;
 
 const BackButton = styled.button`
   margin-top: 20px;
+  margin-right: 20px;
+  padding: 10px 20px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+
+  &:hover {
+    background-color: #5a6268;
+  }
 `;
 
 export default StoryPage;
